@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Worksheet Remix</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Worksheet Remix</h1>
+    <div class="tagline">Turn any worksheet into one built around what your child already loves</div>
+  </div>
+  <button class="icon-btn" id="settings-btn" type="button" style="display:none;">⚙ Settings</button>
+</header>
+
+<main>
+  <section class="panel" id="input-panel">
+    <h2>1. Your worksheet</h2>
+
+    <div class="tabs">
+      <button type="button" class="tab-btn active" data-tab="paste">Paste text</button>
+      <button type="button" class="tab-btn" data-tab="upload">Upload file</button>
+    </div>
+
+    <div id="tab-paste">
+      <label for="worksheet_text">Worksheet content</label>
+      <textarea id="worksheet_text" rows="10" placeholder="Paste the worksheet's instructions and questions here, e.g.
+
+Addition to 20
+1. 7 + 5 = ?
+2. 9 + 8 = ?
+3. Sam has 6 apples. He buys 7 more. How many does he have now?"></textarea>
+    </div>
+
+    <div id="tab-upload" style="display:none;">
+      <label for="worksheet_file">Upload a .txt or .docx file</label>
+      <input type="file" id="worksheet_file" accept=".txt,.docx">
+      <p style="color:var(--ink-soft); font-size:0.82rem; margin-top:8px;">
+        PDF and scanned/image worksheets aren't supported yet in this prototype —
+        paste the text instead for now. See the README for why.
+      </p>
+    </div>
+
+    <h2 style="margin-top:24px;">2. Their special interest</h2>
+    <label for="theme">Theme (be specific)</label>
+    <input type="text" id="theme" placeholder="e.g. Minecraft, Pokémon, Bluey, Roblox, dinosaurs, Frozen">
+    <div class="chip-row">
+      <button type="button" class="chip" data-theme="Minecraft">Minecraft</button>
+      <button type="button" class="chip" data-theme="Pokémon">Pokémon</button>
+      <button type="button" class="chip" data-theme="Roblox">Roblox</button>
+      <button type="button" class="chip" data-theme="Bluey">Bluey</button>
+      <button type="button" class="chip" data-theme="Paw Patrol">Paw Patrol</button>
+      <button type="button" class="chip" data-theme="Dinosaurs">Dinosaurs</button>
+      <button type="button" class="chip" data-theme="Frozen">Frozen</button>
+    </div>
+
+    <label for="notes">Notes about the child (optional)</label>
+    <textarea id="notes" rows="2" placeholder="e.g. reading age 7, avoid anything about storms, likes very literal wording"></textarea>
+
+    <h2 style="margin-top:24px;">3. Display options</h2>
+    <div class="sen-options">
+      <label><input type="checkbox" id="opt-dyslexia"> Dyslexia-friendly font</label>
+      <label><input type="checkbox" id="opt-large"> Larger text</label>
+      <label><input type="checkbox" id="opt-original"> Show original alongside</label>
+    </div>
+
+    <button class="generate-btn" id="generate-btn" type="button">Rewrite worksheet</button>
+    <div class="status-line" id="status-line"></div>
+
+    <div class="examples">
+      <h2>Or see a finished example</h2>
+      <div id="example-list"></div>
+    </div>
+  </section>
+
+  <section class="panel" id="output-panel">
+    <div class="output-toolbar">
+      <h2 style="margin:0;">Result</h2>
+      <div class="toggles">
+        <button class="icon-btn" id="print-btn" type="button" style="display:none;">🖨 Print / Save PDF</button>
+      </div>
+    </div>
+    <div id="output-content">
+      <div class="empty-state">Your rewritten worksheet will appear here.<br>Fill in the form and hit Rewrite — or try a finished example on the left.</div>
+    </div>
+  </section>
+</main>
+
+<dialog id="settings-dialog">
+  <div class="dialog-inner">
+    <h2 style="margin-top:0;">Settings</h2>
+
+    <div id="settings-apikey-block">
+      <p>
+        This runs your own Anthropic API key to do the rewriting. Your key is stored
+        only in this browser (localStorage) and sent directly to this server — it
+        never goes anywhere else. Get a key at <strong>console.anthropic.com</strong>.
+      </p>
+      <label for="api-key-input">API key</label>
+      <input type="text" id="api-key-input" placeholder="sk-ant-...">
+    </div>
+
+    <div id="settings-access-block">
+      <p>This beta needs an access code — ask whoever shared this link with you for it.</p>
+      <label for="access-code-input">Access code</label>
+      <input type="text" id="access-code-input" placeholder="Access code">
+    </div>
+
+    <div class="dialog-actions">
+      <button class="icon-btn" id="settings-cancel" type="button">Cancel</button>
+      <button class="icon-btn" id="settings-save" type="button" style="background:var(--accent); color:#fff; border-color:var(--accent);">Save</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="consent-dialog">
+  <div class="dialog-inner">
+    <h2 style="margin-top:0;">Before you try this</h2>
+    <p>This is an early prototype, not a finished product. A few things worth knowing:</p>
+    <ul style="font-size:0.88rem; color:var(--ink-soft); padding-left:1.2em;">
+      <li style="margin-bottom:8px;">The worksheet content is AI-generated. Please check any maths answers or facts before giving it to a child — don't assume it's correct.</li>
+      <li style="margin-bottom:8px;">Please don't upload or paste a worksheet containing a child's full name or other identifying details.</li>
+      <li style="margin-bottom:8px;">Nothing you enter is stored on the server beyond generating your result.</li>
+    </ul>
+    <div class="dialog-actions">
+      <button class="icon-btn" id="consent-ack" type="button" style="background:var(--accent); color:#fff; border-color:var(--accent);">Got it, continue</button>
+    </div>
+  </div>
+</dialog>
+
+<script src="{{ url_for('static', filename='examples.js') }}"></script>
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
