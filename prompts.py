@@ -11,7 +11,9 @@ special interest (a video game, film, TV show, book series, hobby, etc.), so the
 is more motivated to engage with the material.
 
 You will be given:
-1. The text of an existing worksheet (subject, instructions, and numbered questions/items).
+1. An existing worksheet - either as plain text, or as an attached PDF (which may be a
+digitally created document or a scan/photograph of a printed worksheet; read it as
+carefully as you would a clear text version, including handwritten annotations if legible).
 2. A "theme" - the child's special interest.
 3. Optional notes about the child (reading level, sensitivities, preferred vocabulary).
 
@@ -86,4 +88,19 @@ def build_user_message(worksheet_text: str, theme: str, notes: str = "") -> str:
     if notes.strip():
         parts.append(f"NOTES ABOUT THE CHILD: {notes.strip()}")
     parts.append("WORKSHEET TEXT:\n" + worksheet_text.strip())
+    return "\n\n".join(parts)
+
+
+def build_user_message_for_pdf(theme: str, notes: str = "") -> str:
+    """Companion text sent alongside an attached PDF document block - the
+    worksheet itself isn't repeated here since Claude reads it from the PDF."""
+    parts = [
+        f"THEME (child's special interest): {theme.strip()}",
+    ]
+    if notes.strip():
+        parts.append(f"NOTES ABOUT THE CHILD: {notes.strip()}")
+    parts.append(
+        "WORKSHEET: see the attached PDF document. It may be a clean digital "
+        "document or a scan/photo of a printed page - read it carefully either way."
+    )
     return "\n\n".join(parts)
