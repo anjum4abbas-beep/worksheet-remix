@@ -14,8 +14,10 @@ app = Flask(__name__)
 
 MODEL = os.environ.get("SEN_WORKSHEETS_MODEL", "claude-sonnet-4-5")
 
-# Keep well under Anthropic's 32MB request cap once base64-encoded (~33% larger).
-MAX_PDF_BYTES = 15 * 1024 * 1024
+# Kept modest to stay within the free hosting tier's limited RAM - a single
+# worker process on that tier doesn't have much headroom for a large file
+# held in memory plus its base64-encoded copy at the same time.
+MAX_PDF_BYTES = 8 * 1024 * 1024
 
 # --- Hosted-beta configuration (all optional; sensible defaults for local/dev use) ---
 # Set ANTHROPIC_API_KEY on the server so pilot testers never need their own key.
